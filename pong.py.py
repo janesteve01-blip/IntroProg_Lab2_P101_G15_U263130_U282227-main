@@ -90,7 +90,6 @@ def get_config() -> tuple[int, int, int, int, int]:
     Parameters
     ----------
     None
-
     Returns
     -------
     int, int, int, int, int : 
@@ -305,16 +304,26 @@ def ask_yes_no(prompt: str) -> bool:
     """
     while True:
         try:
-            answer = str(input(f"{prompt}")).strip().lower()
+            answer = str(input(f"{prompt}")).strip().lower() # Defining the input has to enter, we allow upper and lowercase, also space before and after the right input
         except ValueError:
             print("Thats not a valid answer")
         else:
             if answer == "yes" or answer == "y":
                 return True
+
+                # If the answer is "yes" or "y" lower or uppercase then we return the boolean value "True"
+            
             elif answer == "no" or answer == "n":
                 return False
+
+                # If the answer is "no" or "n" lower or uppercase then we return the boolean value "False"
+
             else:
                 print("\nThats not a valid input, answer with: 'y', 'yes' or 'n', 'no' in lower or uppercase")
+
+                # If the user doesn't enter what he is supossed to we show this message and keep asking to enter yes or no
+
+
    
 def move_paddle(current_y: int, direction: int, speed: int, height: int, paddle_h: int) -> int:
     """Return new y coordinate of a paddle, updating current position
@@ -331,21 +340,25 @@ def move_paddle(current_y: int, direction: int, speed: int, height: int, paddle_
     That is when it reaches the limits (up or down) it stays there, so consider paddle_h and height here.
     """
     
-    new_y = current_y 
+    new_y = current_y # Defining the return
 
     if direction == -1:
             new_y = new_y - speed
     elif direction == 1:
             new_y = new_y + speed
     
+    # Movement of the paddle depending on the key the user pressed
+    
     if new_y < 0:
         new_y = 0
     elif new_y + paddle_h >= height:
         new_y = height - paddle_h
 
+    # Keeping the paddle on the screen
 
     return new_y
 
+    # Returning the new value of position of the paddle
 
 def move_ball(x: int, y: int, vx: int, vy: int) -> tuple[int, int]:
     """Move the ball one time step. Return (x', y').
@@ -364,9 +377,12 @@ def move_ball(x: int, y: int, vx: int, vy: int) -> tuple[int, int]:
     
     new_x = x + vx
     new_y = y + vy
-    
+
+    # Defining the return of the new values of the position of the ball 
+
     return new_x, new_y
-    
+
+    # Return of the values of position of the ball
 
 def collide_ball_walls(x: int, y: int, vx: int, vy: int, radius: int, width: int, height: int) -> tuple[int, int, int, int]:
     """Detect and handle collisions with top/bottom walls.
@@ -392,8 +408,12 @@ def collide_ball_walls(x: int, y: int, vx: int, vy: int, radius: int, width: int
     elif y - radius <= 0:
         y = radius
         vy = -vy
+
+    # Defining the collision of the ball with the top and bottom walls, changing the sign of the vertical speed whenever a collision occurs
     
     return x, y, vx, vy
+
+    # Return of the updated values of position and speed of the ball
 
 
 def collide_ball_paddle(x: int, y: int, vx: int, vy: int, paddle_x: int, paddle_y: int, paddle_w: int, paddle_h: int, radius: int) -> tuple[int, int, int, int, bool]:
@@ -446,36 +466,51 @@ def collide_ball_paddle(x: int, y: int, vx: int, vy: int, paddle_x: int, paddle_
       which is sufficient for this game.
     """
     
-    hit = False
+    hit = False # Setting the collision boolean value to false
     ball_up = y - radius
     ball_down = y + radius
     ball_left = x - radius
     ball_right = x + radius
+
+    # Defining the hitbox of the ball as if it was a square
 
     paddle_up = paddle_y 
     paddle_down = paddle_y + paddle_h
     paddle_left = paddle_x 
     paddle_right = paddle_x + paddle_w
 
+    # Defining the hitbox of both paddles
+
     x_new = x
     y_new = y
 
     vx_new = vx
     vy_new = vy
-    
+
+    # Defining the new positions and speeds of the ball (the returns)
+
     if ball_right > paddle_left and ball_up < paddle_down and ball_down > paddle_up and ball_left < paddle_right:
         if vx > 0:
             x_new = paddle_left - radius
         elif vx < 0:
             x_new = paddle_right + radius
         vx_new = - vx_new
+
+        # If the ball collides with a paddle change sign of its horizontal speed 
+        # When a collison occurs the ball is placed just outside the paddle to avoid overlap
+
         vx_new *= 1.03
         vy_new *= 1.03
+
+        # With each collision the balls vertical and horizontal speed increases.
         
         hit = True       
 
+        # When a collision occurs ser the value of collsion to True
 
     return x_new, y_new, vx_new, vy_new, hit
+
+    # Return of the new values of postion and speed of the ball and the boolean value of the collision
 
 def reset_ball(center_x: int, center_y: int, vx0: int, vy0: int, to_right: bool) -> tuple[int, int, int, int]:
     """ Reset the ball to the center of the screen and return its initial position and velocity after a point has been scored.
@@ -514,21 +549,30 @@ def reset_ball(center_x: int, center_y: int, vx0: int, vy0: int, to_right: bool)
     x = center_x
     y = center_y
 
+    # Defining the return of the center of the screen center
     
     if to_right == True:
-        vx = vx0
-        if random.randint(0,1) == 0:
-            vy = vy0
-        else:
-            vy = -vy0
-    else:
-        vx = -vx0
+        vx = vx0 # If the right player scores the speed horizontal speed of the ball remains positive (ball to the right)
         if random.randint(0,1) == 0:
             vy = vy0
         else:
             vy = -vy0
 
+        # Randomization of the sign of the vertical speed whenever the right player scores (ball to the top or to bottom)
+
+    else:
+        vx = -vx0 # If the left player scores the horizontal speed of the ball changes sign to negative (ball to the left)
+        
+        if random.randint(0,1) == 0:
+            vy = vy0
+        else:
+            vy = -vy0
+
+        # Randomization of the sign of the vertical speed whenever the left player scores (ball to the top or to bottom)
+
     return x, y, vx, vy
+
+        # Return of the values of the center of the screen and the new values of horizontal and vertical speed depending on who scores
 
 def compute_ai_direction(ball_y: int, paddle_y: int, paddle_h: int) -> int:
     """ Compute the movement direction (-1, 0, +1) for an AI-controlled paddle.
@@ -560,20 +604,17 @@ def compute_ai_direction(ball_y: int, paddle_y: int, paddle_h: int) -> int:
     when the ball is aligned enough.
     """
     
-    paddle_center = paddle_y + paddle_h/2
+    paddle_center = paddle_y + paddle_h/2 # Defining the vertical value of the center of the paddle
     if ball_y > paddle_center + 5:
-        return 1    
+        return 1  
     elif ball_y < paddle_center - 5:
         return -1
     else:
         return 0
 
-        
-    
+    # The paddle controlled by the "ai" follows the position of the ball with a tolerence of 5 pixels to avoid vibration   
+    # Returns the vertical movement that the "ai" has to do depending on the position of the ball
 
-# =============================================
-# Checking KEYS UP/DOWN (given to the students)
-# =============================================
 
 def read_player_direction(keys, key_up: int, key_down: int) -> int:
     """Return -1, 0, or +1 based on pressed keys."""
@@ -633,6 +674,9 @@ def show_message(screen: pygame.Surface,message: str,backg_col, foreg_col, show_
 
 def main() -> None:
     PLAY_AGAINST_MACHINE = ask_yes_no("\nDo you want to play against the machine? (y/n): ")
+
+    # Creating the dependence of the boolean variable to the asnwer the user gave to the "ask_yes_no" function
+    # Creation of the yes/no question to the user
 
     paddle_h, paddle_speed, speed_ball_x, speed_ball_y, ball_radius = get_config()
     backg_col, foreg_col = change_colors()
